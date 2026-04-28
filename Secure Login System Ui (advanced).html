@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Login</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+/* Animated particle background */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(15px);
+  padding: 30px;
+  border-radius: 20px;
+  width: 350px;
+  color: white;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+
+h2 {
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#22c55e,#4ade80);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.switch {
+  text-align: center;
+  margin-top: 10px;
+  cursor: pointer;
+  color: #38bdf8;
+}
+
+.result {
+  margin-top: 10px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+  <div class="card">
+    <h2 id="title">Login</h2>
+
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+
+    <button onclick="handleAuth()">Submit</button>
+
+    <div class="switch" onclick="toggleMode()" id="switchText">
+      Don't have an account? Register
+    </div>
+
+    <div class="result" id="result"></div>
+  </div>
+</div>
+
+<script>
+let isLogin = true;
+let users = {}; // demo storage (NOT secure)
+
+function toggleMode() {
+  isLogin = !isLogin;
+  document.getElementById('title').innerText = isLogin ? 'Login' : 'Register';
+  document.getElementById('switchText').innerText = isLogin
+    ? "Don't have an account? Register"
+    : "Already have an account? Login";
+}
+
+function hashPassword(pwd) {
+  return btoa(pwd); // fake hash (demo only)
+}
+
+function handleAuth() {
+  const user = document.getElementById('username').value;
+  const pass = hashPassword(document.getElementById('password').value);
+  const result = document.getElementById('result');
+
+  if (!user || !pass) {
+    result.innerText = 'Fill all fields';
+    return;
+  }
+
+  if (isLogin) {
+    if (users[user] && users[user] === pass) {
+      result.innerText = 'Login successful';
+    } else {
+      result.innerText = 'Invalid credentials';
+    }
+  } else {
+    if (users[user]) {
+      result.innerText = 'User already exists';
+    } else {
+      users[user] = pass;
+      result.innerText = 'Registered successfully';
+    }
+  }
+}
+
+/* Particle animation */
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+for (let i = 0; i < 100; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2,
+    dx: Math.random() - 0.5,
+    dy: Math.random() - 0.5
+  });
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    p.x += p.dx;
+    p.y += p.dy;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
